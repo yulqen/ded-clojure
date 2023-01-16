@@ -2,16 +2,22 @@
   (:gen-class)
   (:require [reitit.ring :as ring]
             [org.httpkit.server :as s]
-            [hiccup.core :as h]
+            [hiccup.page :as p]
             [ring.middleware.reload :refer [wrap-reload]]))
 
 (defn handler [_]
   {:status 200, :body "ok"})
 
 (defn site-handler [_]
-  {:body (h/html
-          [:body
-           [:h1 "bobbins"]])})
+  {:body (p/html5
+          [:head
+           [:title "Sites page!"]
+           [:meta {:charset "UTF-8"}]
+           [:meta {:name "viewport"
+                   :content "width=device-width, initial-scale=1.0"}]
+           [:body
+            [:h1 "bobbins"]
+            [:p "This is RANDOM paragraph of text that no one really cares about."]]])})
 
 (defn wrap [handler id]
   (fn [request]
