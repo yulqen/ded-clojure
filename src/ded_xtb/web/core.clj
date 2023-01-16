@@ -1,10 +1,17 @@
-(ns web.core
+(ns ded-xtb.web.core
   (:gen-class)
   (:require [reitit.ring :as ring]
-            [org.httpkit.server :as s]))
+            [org.httpkit.server :as s]
+            [hiccup.core :as h]
+            [ring.middleware.reload :refer [wrap-reload]]))
 
 (defn handler [_]
   {:status 200, :body "ok"})
+
+(defn site-handler [_]
+  {:body (h/html
+          [:body
+           [:h1 "bobbins"]])})
 
 (defn wrap [handler id]
   (fn [request]
@@ -13,13 +20,16 @@
 (def app
   (ring/ring-handler
     (ring/router
-      ["/api" {:middleware [[wrap :api]]}
+     ["/api" {:middleware [[wrap :admin]]}
        ["/ping" {:get handler
                  :name ::ping}]
        ["/admin" {:middleware [[wrap :admin]]}
         ["/users" {:get handler
-                   :post handler}]]])))
+                   :post handler}]]
+      ["/sites" {:get site-handler}]])))
 
+(def reloadable-app
+  (wrap-reload #'app))
 
 (defonce server (atom nil))
 
@@ -34,6 +44,4 @@
   ;; The #' is useful when you want to hot-reload code
   ;; You may want to take a look: https://github.com/clojure/tools.namespace
   ;; and https://http-kit.github.io/migration.html#reload
-  (reset! server (s/run-server #'app {:port 8080})))
-
-
+  (reset! server (s/run-server reloadable-app {:port 8080})))
