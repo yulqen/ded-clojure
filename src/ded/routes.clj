@@ -25,13 +25,19 @@
 
 (defn site-handler [req]
   (pprint/pprint req)
-  (let [new-site {:xt/id         :mammoth-site
-                  :site/name     "Mammoth Site"
-                  :site/type     :submarine-base
-                  :site/id       100
-                  :site/location "Hopwirth Flogash"}
-        _        (db/add-site (-> req :application/component :database) new-site)
-        sites    (db/get-all (-> req :application/component :database))]
+  (let [new-site1 {:xt/id         :mammoth-site
+                   :site/name     "Mammoth Site"
+                   :site/type     :submarine-base
+                   :site/id       100
+                   :site/location "Hopwirth Flogash"}
+        new-site2 {:xt/id         :cloth-site
+                   :site/name     "Cloth Site"
+                   :site/type     :submarine-base
+                   :site/id       101
+                   :site/location "McSkelton Brimmy"}
+        _         (db/add-site (-> req :application/component :database) new-site1)
+        _         (db/add-site (-> req :application/component :database) new-site2)
+        sites     (db/get-all (-> req :application/component :database))]
     (-> (resp/response
          (p/html5
           [:head
@@ -40,8 +46,9 @@
            [:meta {:name "Content-Type" :content "text/html"}]
            [:meta {:name    "viewport"
                    :content "width=device-width, initial-scale=1.0"}]]
-           [:body
-            [:p sites]]))
+          [:body
+           [:ul
+            [:li (for [x (map :site/name (map first sites))] [:li x])]]]))
          ;; (-> (resp/response
          ;;      (p/html5
          ;;       [:head
