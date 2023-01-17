@@ -24,7 +24,6 @@
         (render-page resp)))))
 
 (defn site-handler [req]
-  (pprint/pprint req)
   (let [new-site1 {:xt/id         :mammoth-site
                    :site/name     "Mammoth Site"
                    :site/type     :submarine-base
