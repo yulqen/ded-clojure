@@ -35,6 +35,12 @@
             :site/id 101
             :site/location "Grimthorpe Jyres"})
 
+
+(defn add-site [component-node site]
+  (xt/submit-tx component-node
+                [[::xt/put
+                  site]]))
+
 (defn get-site-by-id
   [id]
   (xt/q (xt/db xtdb-node)
@@ -50,12 +56,11 @@
                   [e :xt/id xtid]
                   [e :site/name name]]}))
 
-(defn get-all [](xt/q (xt/db xtdb-node)
+(defn get-all [node](xt/q (xt/db node)
                       '{:find [(pull e [*])]
                         :where [[e :xt/id]]}))
 
 (comment
   (get-site-by-id 101)
-  (get-all)
   (get-site-ids)
   ,)

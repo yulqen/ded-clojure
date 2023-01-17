@@ -1,6 +1,7 @@
 (ns ded.routes
   (:require [ring.middleware.defaults :as ring-defaults]
             [hiccup.page :as p]
+            [ded.db :as db]
             [clojure.pprint :as pprint]
             [compojure.route :as route]
             [compojure.coercions :refer [as-int]]
@@ -24,19 +25,36 @@
 
 (defn site-handler [req]
   (pprint/pprint req)
-  (-> (resp/response
-       (p/html5
-        [:head
-         [:title "Sites page!"]
-         [:meta {:charset "UTF-8"}]
-         [:meta {:name "Content-Type" :content "text/html"}]
-         [:meta {:name "viewport"
-                 :content "width=device-width, initial-scale=1.0"}]
-         [:body
-          [:h1 "Wackatan Pobbles knoc!"]
-          [:a {:href "http://nufc.com"} "nufc.com"]
-          [:p "This is ROOMADOOM staplehurst paragraph of text that no one really cares about."]]]))
-      (resp/content-type "text/html")))
+  (let [new-site {:xt/id         :mammoth-site
+                  :site/name     "Mammoth Site"
+                  :site/type     :submarine-base
+                  :site/id       100
+                  :site/location "Hopwirth Flogash"}
+        _        (db/add-site (-> req :application/component :database) new-site)
+        sites    (db/get-all (-> req :application/component :database))]
+    (-> (resp/response
+         (p/html5
+          [:head
+           [:title "SITES"]
+           [:meta {:charset "UTF-8"}]
+           [:meta {:name "Content-Type" :content "text/html"}]
+           [:meta {:name    "viewport"
+                   :content "width=device-width, initial-scale=1.0"}]]
+           [:body
+            [:p sites]]))
+         ;; (-> (resp/response
+         ;;      (p/html5
+         ;;       [:head
+         ;;        [:title "Sites page!"]
+         ;;        [:meta {:charset "UTF-8"}]
+         ;;        [:meta {:name "Content-Type" :content "text/html"}]
+         ;;        [:meta {:name "viewport"
+         ;;                :content "width=device-width, initial-scale=1.0"}]
+         ;;        [:body
+         ;;         [:h1 "Wackatan Pobbles knoc!"]
+         ;;         [:a {:href "http://nufc.com"} "nufc.com"]
+         ;;         [:p "This is ROOMADOOM staplehurst paragraph of text that no one really cares about."]]]))
+         (resp/content-type "text/html"))))
 
 ;; Helper for building the middleware:
 (defn- add-app-component
@@ -70,8 +88,9 @@
   need to define our route handlers so that they can be parameterized."
   [application]
   (let-routes [wrap (middleware-stack application #'my-middleware)]
-    (GET  "/"                        []              (wrap #'default-handler))
-    (GET "/sites" [] (wrap #'site-handler))
+    (GET  "/" [] (wrap #'default-handler))
+    (GET "/chorley" [] (wrap #'default-handler))
+    (GET "/sites" [] (wrap #'site-handler))    
     ;; horrible: application should POST to this URL!
     ;;(GET  "/user/delete/:id{[0-9]+}" [id :<< as-int] (wrap #'user-ctl/delete-by-id))
     ;; add a new user:
