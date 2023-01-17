@@ -1,35 +1,15 @@
-(ns ded-xtb.web.core
+(ns ded.core
   (:gen-class)
   (:require [hiccup.page :as p]
-            [ring.adapter.jetty :refer [run-jetty]]
             [ring.util.response :as resp]
             [ring.middleware.defaults :as ring-defaults]
             [clojure.pprint]
-            [clojure.java.io :as io]
             [compojure.coercions :refer [as-int]]
             [compojure.core :refer [GET POST let-routes]]
             [compojure.route :as route]
-            [xtdb.api :as xt]
+            [ded.components :as my-components]
+            [ded.db :as db]
             [com.stuartsierra.component :as component]))
-
-;; (defn start-xtdb! []
-;;   (letfn [(kv-store [dir]
-;;             {:kv-store {:xtdb/module 'xtdb.rocksdb/->kv-store
-;;                         :db-dir (io/file dir)
-;;                         :sync? true}})]
-;;     (xt/start-node
-;;      {:xtdb/tx-log (kv-store "data/dev/tx-log")
-;;       :xtdb/document-store (kv-store "data/dev/doc-store")
-;;       :xtdb/index-store (kv-store "data/dev/index-store")})))
-(defn start-xtdb! []
-  (xt/start-node {}))
-
-(def xtdb-node (start-xtdb!))
-;; note that attempting to eval this expression more than once before first calling `stop-xtdb!` will throw a RocksDB locking error
-;; this is because a node that depends on native libraries must be `.close`'d explicitly
-
-(defn stop-xtdb! []
-  (.close xtdb-node))
 
 (defn handler [request]
   (clojure.pprint/pprint request)
@@ -45,23 +25,13 @@
          [:meta {:name "viewport"
                  :content "width=device-width, initial-scale=1.0"}]
          [:body
-          [:h1 "bobbins"]
+          [:h1 "Bobbins woo"]
           [:p "This is RANDOM paragraph of text that no one really cares about."]]]))
       (resp/content-type "text/html")))
   
-
-(defrecord Application [config
-                        database
-                        state]
-  component/Lifecycle
-  (start [this]
-    (assoc this :state "Running"))
-  (stop [this]
-    (assoc this :state "Stopped")))
-
 (defn my-application
   [config]
-  (component/using (map->Application {:config config}) [:database]))
+  (component/using (my-components/map->Application {:config config}) [:database]))
 
 (defn render-page [response]
     {:body "nonce!"})
@@ -129,86 +99,18 @@
     (route/resources "/")
     (route/not-found "Not Found")))
 
-;; Standard web server component -- knows how to stop and start your chosen
-;; web server... uses Jetty but explains how to use http-kit instead:
-;; lifecycle for the specified web server in which we run
-(defrecord WebServer [handler-fn server port ; parameters
-                      application            ; dependencies
-                      http-server shutdown]  ; state
-  component/Lifecycle
-  (start [this]
-         ;; it's important for your components to be idempotent: if you start
-         ;; them more than once, only the first call to start should do anything
-         ;; and subsequent calls should be an no-op -- the same applies to the
-         ;; stop calls: only stop the system if it is running, else do nothing
-         (if http-server
-           this
-           (assoc this
-                  ;; start a Jetty web server -- use :join? false
-                  ;; so that it does not block (we use a promise
-                  ;; to block on in -main).
-                  ;; to start an http-kit web server instead:
-                  ;; 1. call run-server instead of run-jetty
-                  ;; 2. omit :join? false since http-kit does
-                  ;; not block when it starts
-                  :http-server (run-jetty (handler-fn application)
-                                          {:port port :join? false})
-                  ;; this promise exists primarily so -main can
-                  ;; wait on something, since we start the web
-                  ;; server in a non-blocking way:
-                  :shutdown (promise))))
-  (stop  [this]
-         (if http-server
-           (do
-             ;; shutdown Jetty: call .stop on the server object:
-             (.stop http-server)
-             ;; shutdown http-kit: invoke the server (as a function):
-             ;; (http-server)
-             ;; deliver the promise to indicate shutdown (this is
-             ;; really just good housekeeping, since you're only
-             ;; going to call stop via the REPL when you are not
-             ;; waiting on the promise):
-             (deliver shutdown true)
-             (assoc this :http-server nil))
-           this)))
 
 (defn web-server
   "Return a WebServer component that depends on the application.
   The handler-fn is a function that accepts the application (Component) and
   returns a fully configured Ring handler (with middeware)."
   [handler-fn port]
-  (component/using (map->WebServer {:handler-fn handler-fn
+  (component/using (my-components/map->WebServer {:handler-fn handler-fn
                                     :port port})
                    [:application]))
 
-()
 
-;; (defrecord Database [db-spec     ; configuration
-;;                      datasource] ; state
-(defrecord Database [datasource] ; state
-  component/Lifecycle
-  (start [this]
-    (let [database (start-xtdb!)]
-      database))
-    ;; (if datasource
-    ;;   this ; already initialized
-    ;;   (let [database (assoc this :datasource {})]
-    ;;     ;; set up database if necessary
-    ;;     ;; LEMON R(populate database (:dbtype db-spec))
-    ;;     database)))
-  (stop [this]
-    (stop-xtdb!)))
-
-  ;; allow the Database component to be "called" with no arguments
-  ;; to produce the underlying datasource object
-  ;; clojure.lang.IFn
-  ;; (invoke [_] datasource))
-
-;; (def ^:private my-db
-;;   "SQLite database connection spec."
-;;   {:dbtype "xtdb" :dbname "my-db"})
-
-(defn setup-database [] (map->Database xtdb-node))
+(defn setup-database [] (my-components/map->Database db/xtdb-node))
 
 ;; This is the piece that combines the generic web server component above with
 ;; your application-specific component defined at the top of the file, and
@@ -227,33 +129,9 @@
    (component/system-map :application (my-application {:repl repl})
                          :database    (setup-database)
                          :web-server  (web-server #'my-handler port))))
-(comment
-  (def system (new-system 8080))
-  (alter-var-root #'system component/start)
-  (alter-var-root #'system component/stop)
-  ;; the comma here just "anchors" the closing paren on this line,
-  ;; which makes it easier to put you cursor at the end of the lines
-  ;; above when you want to evaluate them into the REPL:
-  ,)
 
-(defonce ^:private
-  ^{:doc "This exists so that if you run a socket REPL when
-  you start the application, you can get at the running
-  system easily.
-  Assuming a socket REPL running on 50505:
-  nc localhost 50505
-  user=> (require 'usermanager.main)
-  nil
-  user=> (in-ns 'usermanager.main)
-  ...
-  usermanager.main=> (require '[next.jdbc :as jdbc])
-  nil
-  usermanager.main=> (def db (-> repl-system deref :application :database))
-  #'usermanager.main/db
-  usermanager.main=> (jdbc/execute! (db) [\"select * from addressbook\"])
-  [#:addressbook{:id 1, :first_name \"Sean\", :last_name \"Corfield\", :email \"sean@worldsingles.com\", :department_id 4}]
-  usermanager.main=>"}
-  repl-system
+
+(defonce ^:private repl-system
   (atom nil))
 
 (defn -main
