@@ -1,6 +1,7 @@
 (ns ded.routes
   (:require [ring.middleware.defaults :as ring-defaults]
             [hiccup.page :as p]
+            [clojure.pprint :as pprint]
             [compojure.route :as route]
             [compojure.coercions :refer [as-int]]
             [compojure.core :refer [GET POST let-routes]]
@@ -22,6 +23,7 @@
         (render-page resp)))))
 
 (defn site-handler [req]
+  (pprint/pprint req)
   (-> (resp/response
        (p/html5
         [:head
@@ -31,8 +33,9 @@
          [:meta {:name "viewport"
                  :content "width=device-width, initial-scale=1.0"}]
          [:body
-          [:h1 "Wackatan OOO!"]
-          [:p "This is ROOMADOOM paragraph of text that no one really cares about."]]]))
+          [:h1 "Wackatan Pobbles knoc!"]
+          [:a {:href "http://nufc.com"} "nufc.com"]
+          [:p "This is ROOMADOOM staplehurst paragraph of text that no one really cares about."]]]))
       (resp/content-type "text/html")))
 
 ;; Helper for building the middleware:

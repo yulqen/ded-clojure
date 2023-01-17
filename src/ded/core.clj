@@ -1,3 +1,5 @@
+;; heavily influenced by https://github.com/seancorfield/usermanager-example
+
 (ns ded.core
   (:gen-class)
   (:require [clojure.pprint]
