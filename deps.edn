@@ -6,5 +6,7 @@
          http-kit/http-kit         {:mvn/version "2.5.3"}
          mount/mount               {:mvn/version "0.1.17"}
          hiccup/hiccup             {:mvn/version "1.0.5"}
-         ring/ring-devel           {:mvn/version "1.9.6"}}
+         ring/ring-devel           {:mvn/version "1.9.6"}
+         compojure/compojure       {:mvn/version "1.7.0"}
+         ring/ring-jetty-adapter   {:mvn/version "1.9.6"}}
  }

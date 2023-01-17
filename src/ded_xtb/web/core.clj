@@ -1,12 +1,15 @@
 (ns ded-xtb.web.core
   (:gen-class)
-  (:require [reitit.ring :as ring]
-            [org.httpkit.server :as s]
-            [hiccup.page :as p]
+  (:require [hiccup.page :as p]
+            [ring.adapter.jetty :as jetty]
+            [clojure.pprint]
+            [compojure.core :as compojure]
+            [compojure.route :as route]
             [ring.middleware.reload :refer [wrap-reload]]))
 
-(defn handler [_]
-  {:status 200, :body "ok"})
+(defn handler [request]
+  (clojure.pprint/pprint request)
+  {:status 200, :headers {"Content-Type" "text/html"} :body "hello world"})
 
 (defn site-handler [_]
   {:body (p/html5
@@ -19,35 +22,11 @@
             [:h1 "bobbins"]
             [:p "This is RANDOM paragraph of text that no one really cares about."]]])})
 
-(defn wrap [handler id]
-  (fn [request]
-    (update (handler request) :wrap (fnil conj '()) id)))
+(compojure/defroutes app
+  (compojure/GET "/" [] "Hello world")
+  (route/not-found "Page not found"))
 
-(def app
-  (ring/ring-handler
-    (ring/router
-     ["/api" {:middleware [[wrap :admin]]}
-       ["/ping" {:get handler
-                 :name ::ping}]
-       ["/admin" {:middleware [[wrap :admin]]}
-        ["/users" {:get handler
-                   :post handler}]]
-      ["/sites" {:get site-handler}]])))
-
-(def reloadable-app
-  (wrap-reload #'app))
-
-(defonce server (atom nil))
-
-(defn stop-server []
-  (when-not (nil? @server)
-    ;; graceful shutdown: wait 100ms for existing requests to be finished
-    ;; :timeout is optional, when no timeout, stop immediately
-    (@server :timeout 100)
-    (reset! server nil)))
-
-(defn -main [& args]
-  ;; The #' is useful when you want to hot-reload code
-  ;; You may want to take a look: https://github.com/clojure/tools.namespace
-  ;; and https://http-kit.github.io/migration.html#reload
-  (reset! server (s/run-server reloadable-app {:port 8080})))
+(defn -main
+  [& args]
+  (jetty/run-jetty handler {:port 8080
+                            :join? true}))
