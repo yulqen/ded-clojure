@@ -36,19 +36,19 @@
   {:status 200, :headers {"Content-Type" "text/html"} :body "hello world"})
 
 (defn site-handler [req]
-  (-> (resp/response "Sites Page")
+  (-> (resp/response
+       (p/html5
+        [:head
+         [:title "Sites page!"]
+         [:meta {:charset "UTF-8"}]
+         [:meta {:name "Content-Type" :content "text/html"}]
+         [:meta {:name "viewport"
+                 :content "width=device-width, initial-scale=1.0"}]
+         [:body
+          [:h1 "bobbins"]
+          [:p "This is RANDOM paragraph of text that no one really cares about."]]]))
       (resp/content-type "text/html")))
-  ;; {:body (p/html5
-  ;;         [:head
-  ;;          [:title "Sites page!"]
-  ;;          [:meta {:charset "UTF-8"}]
-  ;;          [:meta {:name "Content-Type" :content "text/html"}]
-  ;;          [:meta {:name "viewport"
-  ;;                  :content "width=device-width, initial-scale=1.0"}]
-  ;;          [:body
-  ;;           [:h1 "bobbins"]
-  ;;           [:p "This is RANDOM paragraph of text that no one really cares about."]]])}
-
+  
 
 (defrecord Application [config
                         database
