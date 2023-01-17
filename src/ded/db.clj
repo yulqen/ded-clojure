@@ -1,17 +1,20 @@
 (ns ded.db
-  (:require [xtdb.api :as xt]))
+  (:require [xtdb.api :as xt]
+            [clojure.java.io :as io]))
+
+(defn start-xtdb! []
+  (letfn [(kv-store [dir]
+            {:kv-store {:xtdb/module 'xtdb.rocksdb/->kv-store
+                        :db-dir (io/file dir)
+                        :sync? true}})]
+    (xt/start-node
+     {:xtdb/tx-log (kv-store "data/dev/tx-log")
+      :xtdb/document-store (kv-store "data/dev/doc-store")
+      :xtdb/index-store (kv-store "data/dev/index-store")})))
+
 
 ;; (defn start-xtdb! []
-;;   (letfn [(kv-store [dir]
-;;             {:kv-store {:xtdb/module 'xtdb.rocksdb/->kv-store
-;;                         :db-dir (io/file dir)
-;;                         :sync? true}})]
-;;     (xt/start-node
-;;      {:xtdb/tx-log (kv-store "data/dev/tx-log")
-;;       :xtdb/document-store (kv-store "data/dev/doc-store")
-;;       :xtdb/index-store (kv-store "data/dev/index-store")})))
-(defn start-xtdb! []
-  (xt/start-node {}))
+;;   (xt/start-node {}))
 
 (def xtdb-node (start-xtdb!))
 ;; note that attempting to eval this expression more than once before first calling `stop-xtdb!` will throw a RocksDB locking error
