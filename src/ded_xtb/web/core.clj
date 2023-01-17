@@ -35,17 +35,20 @@
   (clojure.pprint/pprint request)
   {:status 200, :headers {"Content-Type" "text/html"} :body "hello world"})
 
-(defn site-handler [_]
-  {:body (p/html5
-          [:head
-           [:title "Sites page!"]
-           [:meta {:charset "UTF-8"}]
-           [:meta {:name "Content-Type" :content "text/html"}]
-           [:meta {:name "viewport"
-                   :content "width=device-width, initial-scale=1.0"}]
-           [:body
-            [:h1 "bobbins"]
-            [:p "This is RANDOM paragraph of text that no one really cares about."]]])})
+(defn site-handler [req]
+  (-> (resp/response "Sites Page")
+      (resp/content-type "text/html")))
+  ;; {:body (p/html5
+  ;;         [:head
+  ;;          [:title "Sites page!"]
+  ;;          [:meta {:charset "UTF-8"}]
+  ;;          [:meta {:name "Content-Type" :content "text/html"}]
+  ;;          [:meta {:name "viewport"
+  ;;                  :content "width=device-width, initial-scale=1.0"}]
+  ;;          [:body
+  ;;           [:h1 "bobbins"]
+  ;;           [:p "This is RANDOM paragraph of text that no one really cares about."]]])}
+
 
 (defrecord Application [config
                         database
@@ -70,7 +73,6 @@
 (defn my-middleware
   [handler]
   (fn [request]
-    (clojure.pprint/pprint request)
     (let [resp (handler request)]
       (if (resp/response? resp)
         resp
@@ -113,6 +115,7 @@
   [application]
   (let-routes [wrap (middleware-stack application #'my-middleware)]
     (GET  "/"                        []              (wrap #'default-handler))
+    (GET "/sites" [] (wrap #'site-handler))
     ;; horrible: application should POST to this URL!
     ;;(GET  "/user/delete/:id{[0-9]+}" [id :<< as-int] (wrap #'user-ctl/delete-by-id))
     ;; add a new user:
