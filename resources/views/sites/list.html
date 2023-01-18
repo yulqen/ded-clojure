@@ -1,12 +1,34 @@
 <div>
-  {{sites}}
   {% if sites|empty? %}
   <p>No sites exist but <a href="#">new ones can be added - woo!</a>.</p>
   {% else %}
-  {% for site in data %}
-  <p>{{site}}</p>
-  {% endfor %}
+
+  <table sites="" id="sites" border="10">
+    <tr>
+      <th>
+        Site ID
+      </th>      
+      <th>
+        Site Name
+      </th>
+      <th>
+        Site Location
+      </th>
+      <th>
+        Type
+      </th>      
+    </tr>
+    {% for site in sites %}    
+    <tr>
+      <td>{{site.site/id}}</td>      
+      <td>{{site.site/name}}</td>
+      <td>{{site.site/location}}</td>
+      <td>{{site.site/type}}</td>      
+    </tr>
+    {% endfor %}
+  </table>
+
   {% endif %}
 </div>
-  
-	
+
+

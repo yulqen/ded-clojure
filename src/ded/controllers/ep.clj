@@ -13,7 +13,7 @@
   [req]
   (let [sites (db/get-all (-> req :application/component :database))]
     (-> req
-        (assoc-in [:params :sites] sites)
+        (assoc-in [:params :sites] (vec (flatten (seq sites))))
         ;; (assoc-in [:params :sites] sites)
         (assoc :application/view "list"))))
 
