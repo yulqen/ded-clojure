@@ -17,6 +17,14 @@
         ;; (assoc-in [:params :sites] sites)
         (assoc :application/view "list"))))
 
+(defn save-site
+  "Save a new site into the database."
+  [req]
+  (let [data (-> req
+                 :params
+                 (select-keys [:site/id :site/name :site/location :site/type :xt/id]))]
+    (db/add-site (-> req :application/component :database) data)))
+
 (defn render-page
   "Each handler function here adds :application/view to the request
   data to indicate which view file they want displayed. This allows
