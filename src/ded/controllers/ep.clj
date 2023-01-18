@@ -1,14 +1,35 @@
 (ns ded.controllers.ep
   (:require [ded.db :as db]
             [hiccup.page :as p]
+            [selmer.parser :as tmpl]
             [ring.util.response :as resp]))
 
 (defn default-handler [req]
   (assoc-in req [:params :message]
             (str "Is this fucking thing working?")))
 
-(defn render-page [response]
-  {:body "nonce!"})
+(defn get-sites
+  "Render the list view with all the sites in the database."
+  [req]
+  (let [sites (db/get-all (-> req :application/component :database))]
+    (-> req
+        (assoc-in [:params :sites] sites)
+        (assoc :application/view "list")))
+  )
+
+(defn render-page
+  "Each handler function here adds :application/view to the request
+  data to indicate which view file they want displayed. This allows
+  us to put the rendering logic in one place instead of repeating it
+  for every handler."
+  [req]
+  (let [data {:test "test data"}
+        view (:application/view req "default")
+        html (tmpl/render-file (str "views/sites/" view ".html") data)]
+    (-> (resp/response (tmpl/render-file "layouts/default.html"
+                                         (assoc data :body [:safe html])))
+        (resp/content-type "text/html"))))
+
 
 (defn site-handler [req]
   (let [new-site1 {:xt/id         :mammoth-site

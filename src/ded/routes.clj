@@ -51,7 +51,8 @@
   (let-routes [wrap (middleware-stack application #'my-middleware)]
     (GET  "/" [] (wrap #'ep-controllers/default-handler))
     (GET "/chorley" [] (wrap #'ep-controllers/default-handler))
-    (GET "/sites" [] (wrap #'ep-controllers/site-handler))    
+    (GET "/sites" [] (wrap #'ep-controllers/site-handler))
+    (GET "/sites/list" [] (wrap #'ep-controllers/get-sites))
     ;; horrible: application should POST to this URL!
     ;;(GET  "/user/delete/:id{[0-9]+}" [id :<< as-int] (wrap #'user-ctl/delete-by-id))
     ;; add a new user:

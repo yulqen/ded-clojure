@@ -1,0 +1,12 @@
+<div>
+  {% if sites|empty? %}
+  <p>No sites exist but <a href="#">new ones can be
+      added</a>.</p>
+  {% else %}
+  {% for site in sites %}
+  <p>{{site}}</p>
+  {% endfor %}
+  {% endif %}
+</div>
+  
+	
