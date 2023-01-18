@@ -6,7 +6,7 @@
 
 (defn default-handler [req]
   (assoc-in req [:params :message]
-            (str "Is this fucking thing working?")))
+            (str "Is this thing working?")))
 
 (defn get-sites
   "Render the list view with all the sites in the database."
@@ -14,8 +14,8 @@
   (let [sites (db/get-all (-> req :application/component :database))]
     (-> req
         (assoc-in [:params :sites] sites)
-        (assoc :application/view "list")))
-  )
+        ;; (assoc-in [:params :sites] sites)
+        (assoc :application/view "list"))))
 
 (defn render-page
   "Each handler function here adds :application/view to the request
@@ -23,7 +23,7 @@
   us to put the rendering logic in one place instead of repeating it
   for every handler."
   [req]
-  (let [data {:sites (-> req :params :sites)}
+  (let [data (:params req)
         view (:application/view req "default")
         html (tmpl/render-file (str "views/sites/" view ".html") data)]
     (-> (resp/response (tmpl/render-file "layouts/default.html"
