@@ -42,8 +42,8 @@
                   site]]))
 
 (defn get-site-by-id
-  [id]
-  (xt/q (xt/db xtdb-node)
+  [id component-node]
+  (xt/q (xt/db component-node)
         '{:find [e]
           :in [?id]
           :where [[e :site/id ?id]]}
@@ -61,6 +61,6 @@
                         :where [[e :xt/id]]}))
 
 (comment
-  (get-site-by-id 101)
+  (get-site-by-id 101 xtdb-node)
   (get-site-ids)
   ,)

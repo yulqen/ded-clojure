@@ -54,6 +54,7 @@
     (GET "/sites" [] (wrap #'ep-controllers/site-handler))
     (GET "/sites/list" [] (wrap #'ep-controllers/get-sites))
     (POST "/sites/save" [] (wrap #'ep-controllers/save-site))
+    (GET "/sites/form" [] (wrap #'ep-controllers/edit))
     ;; horrible: application should POST to this URL!
     ;;(GET  "/user/delete/:id{[0-9]+}" [id :<< as-int] (wrap #'user-ctl/delete-by-id))
     ;; add a new user:

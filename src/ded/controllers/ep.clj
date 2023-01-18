@@ -2,6 +2,7 @@
   (:require [ded.db :as db]
             [hiccup.page :as p]
             [selmer.parser :as tmpl]
+            [clojure.walk :refer [keywordize-keys]]
             [ring.util.response :as resp]))
 
 (defn default-handler [req]
@@ -17,13 +18,30 @@
         ;; (assoc-in [:params :sites] sites)
         (assoc :application/view "list"))))
 
+(defn edit
+  "Display the add/edit form.
+  If the :id parameter is present, Compojure will have coerced it to an
+  int and we can use it to populate the edit form by loading that site's
+  data from the addressbook."
+  [req]
+  (let [db   (-> req :application/component :database)
+        site (when-let [id (get-in req [:params :site/id])]
+               (db/get-site-by-id db id))]
+    (-> req
+        (update :params assoc
+                :site site)
+        (assoc :application/view "form"))))
+
 (defn save-site
   "Save a new site into the database."
   [req]
   (let [data (-> req
                  :params
-                 (select-keys [:site/id :site/name :site/location :site/type :xt/id]))]
-    (db/add-site (-> req :application/component :database) data)))
+                 (keywordize-keys)
+                 (select-keys [:site/id :site/name :site/location :site/type :xt/id])
+                 )]
+    (db/add-site (-> req :application/component :database) data)
+    (resp/redirect "/sites/list")))
 
 (defn render-page
   "Each handler function here adds :application/view to the request

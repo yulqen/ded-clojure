@@ -1,0 +1,35 @@
+<h3>Site Info</h3>
+<form class="familiar medium" method="post" action="/sites/save">
+
+	<input type="hidden" name="site/id" id="id"
+         value="102"/>
+
+	<div class="field">
+		<label for="name" class="label">Name:</label>
+		<input type="text" name="site/name" id="name"
+					 value="{{site.site/name}}"/>
+	</div>
+
+	<div class="field">
+		<label for="location" class="label">Location:</label>
+		<input type="text" name="site/location" id="location"
+					 value="{{site.site/last_name}}"/>
+	</div>
+
+	<div class="field">
+		<label for="site-id" class="label">Site-ID:</label>
+		<input type="text" name="xt/id" id="site-id"
+					 value="{{site.xt/id}}"/>
+	</div>
+
+	<div class="field">
+		<label for="site-type" class="label">Site Type:</label>
+	  <input type="text" name="site/type" id="site-type"
+					 value="{{site.site/type}}"/>
+	</div>
+
+	<div class="control">
+		<input type="submit" value="Save Site"/>
+	</div>
+
+</form>
