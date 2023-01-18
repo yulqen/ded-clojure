@@ -12,7 +12,8 @@
 (defn my-middleware
   [handler]
   (fn [request]
-    (let [resp (handler request)]
+    (let [resp (handler request)
+          _    (pprint/pprint resp)]
       (if (resp/response? resp)
         resp
         (ep-controllers/render-page resp)))))

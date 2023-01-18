@@ -23,7 +23,7 @@
   us to put the rendering logic in one place instead of repeating it
   for every handler."
   [req]
-  (let [data {:test "test data"}
+  (let [data {:sites (-> req :params :sites)}
         view (:application/view req "default")
         html (tmpl/render-file (str "views/sites/" view ".html") data)]
     (-> (resp/response (tmpl/render-file "layouts/default.html"
