@@ -1,19 +1,13 @@
 (ns ded.routes
   (:require [ring.middleware.defaults :as ring-defaults]
-            [hiccup.page :as p]
+
             [ded.db :as db]
+            [ded.controllers.ep :as ep-controllers]
             [clojure.pprint :as pprint]
             [compojure.route :as route]
             [compojure.coercions :refer [as-int]]
             [compojure.core :refer [GET POST let-routes]]
             [ring.util.response :as resp]))
-
-(defn default-handler [req]
-  (assoc-in req [:params :message]
-            (str "Is this fucking thing working?")))
-
-(defn render-page [response]
-    {:body "nonce!"})
 
 (defn my-middleware
   [handler]
@@ -21,46 +15,7 @@
     (let [resp (handler request)]
       (if (resp/response? resp)
         resp
-        (render-page resp)))))
-
-(defn site-handler [req]
-  (let [new-site1 {:xt/id         :mammoth-site
-                   :site/name     "Mammoth Site"
-                   :site/type     :submarine-base
-                   :site/id       100
-                   :site/location "Hopwirth Flogash"}
-        new-site2 {:xt/id         :cloth-site
-                   :site/name     "Cloth Site"
-                   :site/type     :submarine-base
-                   :site/id       101
-                   :site/location "McSkelton Brimmy"}
-        _         (db/add-site (-> req :application/component :database) new-site1)
-        _         (db/add-site (-> req :application/component :database) new-site2)
-        sites     (db/get-all (-> req :application/component :database))]
-    (-> (resp/response
-         (p/html5
-          [:head
-           [:title "SITES"]
-           [:meta {:charset "UTF-8"}]
-           [:meta {:name "Content-Type" :content "text/html"}]
-           [:meta {:name    "viewport"
-                   :content "width=device-width, initial-scale=1.0"}]]
-          [:body
-           [:ul
-            [:li (for [x (map :site/name (map first sites))] [:li x])]]]))
-         ;; (-> (resp/response
-         ;;      (p/html5
-         ;;       [:head
-         ;;        [:title "Sites page!"]
-         ;;        [:meta {:charset "UTF-8"}]
-         ;;        [:meta {:name "Content-Type" :content "text/html"}]
-         ;;        [:meta {:name "viewport"
-         ;;                :content "width=device-width, initial-scale=1.0"}]
-         ;;        [:body
-         ;;         [:h1 "Wackatan Pobbles knoc!"]
-         ;;         [:a {:href "http://nufc.com"} "nufc.com"]
-         ;;         [:p "This is ROOMADOOM staplehurst paragraph of text that no one really cares about."]]]))
-         (resp/content-type "text/html"))))
+        (ep-controllers/render-page resp)))))
 
 ;; Helper for building the middleware:
 (defn- add-app-component
@@ -94,9 +49,9 @@
   need to define our route handlers so that they can be parameterized."
   [application]
   (let-routes [wrap (middleware-stack application #'my-middleware)]
-    (GET  "/" [] (wrap #'default-handler))
-    (GET "/chorley" [] (wrap #'default-handler))
-    (GET "/sites" [] (wrap #'site-handler))    
+    (GET  "/" [] (wrap #'ep-controllers/default-handler))
+    (GET "/chorley" [] (wrap #'ep-controllers/default-handler))
+    (GET "/sites" [] (wrap #'ep-controllers/site-handler))    
     ;; horrible: application should POST to this URL!
     ;;(GET  "/user/delete/:id{[0-9]+}" [id :<< as-int] (wrap #'user-ctl/delete-by-id))
     ;; add a new user:
