@@ -50,8 +50,6 @@
   [application]
   (let-routes [wrap (middleware-stack application #'my-middleware)]
     (GET  "/" [] (wrap #'ep-controllers/default-handler))
-    (GET "/chorley" [] (wrap #'ep-controllers/default-handler))
-    (GET "/sites" [] (wrap #'ep-controllers/site-handler))
     (GET "/sites/list" [] (wrap #'ep-controllers/get-sites))
     (POST "/sites/save" [] (wrap #'ep-controllers/save-site))
     (GET "/sites/form" [] (wrap #'ep-controllers/edit))

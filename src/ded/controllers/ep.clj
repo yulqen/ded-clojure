@@ -15,14 +15,13 @@
   (let [sites (db/get-all (-> req :application/component :database))]
     (-> req
         (assoc-in [:params :sites] (vec (flatten (seq sites))))
-        ;; (assoc-in [:params :sites] sites)
         (assoc :application/view "list"))))
 
 (defn edit
   "Display the add/edit form.
   If the :id parameter is present, Compojure will have coerced it to an
   int and we can use it to populate the edit form by loading that site's
-  data from the addressbook."
+  data from the the database."
   [req]
   (let [db   (-> req :application/component :database)
         site (when-let [id (get-in req [:params :site/id])]
@@ -37,49 +36,17 @@
   [req]
   (let [data (-> req
                  :params
-                 (keywordize-keys)
+                 (keywordize-keys) ;; we have to do this as form fields come in as strings
                  (select-keys [:site/id :site/name :site/location :site/type :xt/id])
                  )]
     (db/add-site (-> req :application/component :database) data)
     (resp/redirect "/sites/list")))
 
 (defn render-page
-  "Each handler function here adds :application/view to the request
-  data to indicate which view file they want displayed. This allows
-  us to put the rendering logic in one place instead of repeating it
-  for every handler."
   [req]
-  (let [data (:params req)
+  (let [data (:params req) ;; just passing through the data
         view (:application/view req "default")
         html (tmpl/render-file (str "views/sites/" view ".html") data)]
     (-> (resp/response (tmpl/render-file "layouts/default.html"
                                          (assoc data :body [:safe html])))
         (resp/content-type "text/html"))))
-
-
-(defn site-handler [req]
-  (let [new-site1 {:xt/id         :mammoth-site
-                   :site/name     "Mammoth Site"
-                   :site/type     :submarine-base
-                   :site/id       100
-                   :site/location "Hopwirth Flogash"}
-        new-site2 {:xt/id         :cloth-site
-                   :site/name     "Cloth Site"
-                   :site/type     :submarine-base
-                   :site/id       101
-                   :site/location "McSkelton Brimmy"}
-        _         (db/add-site (-> req :application/component :database) new-site1)
-        _         (db/add-site (-> req :application/component :database) new-site2)
-        sites     (db/get-all (-> req :application/component :database))]
-    (-> (resp/response
-         (p/html5
-          [:head
-           [:title "SITES"]
-           [:meta {:charset "UTF-8"}]
-           [:meta {:name "Content-Type" :content "text/html"}]
-           [:meta {:name    "viewport"
-                   :content "width=device-width, initial-scale=1.0"}]]
-          [:body
-           [:ul
-            [:li (for [x (map :site/name (map first sites))] [:li x])]]]))
-         (resp/content-type "text/html"))))
