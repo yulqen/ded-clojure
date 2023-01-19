@@ -1,6 +1,8 @@
 (ns ded.db
   (:require [xtdb.api :as xt]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clojure.string :as str])
+  (:import [java.util UUID]))
 
 (defn start-xtdb! []
   (letfn [(kv-store [dir]
@@ -35,6 +37,14 @@
             :site/id 101
             :site/location "Grimthorpe Jyres"})
 
+
+;; We need our xt/id fields to be automatically generated.
+;; Schema ideas:
+;; AA10000 - where AA is type identifier and 10000 automatically increments
+;; Split UUID - can be generated easily but are unweildy presentationally
+;; see below:
+
+(str/join "-" (take 2 (str/split (.toString (UUID/randomUUID)) #"-")))
 
 (defn add-site [component-node site]
   (xt/submit-tx component-node
