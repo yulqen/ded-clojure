@@ -66,9 +66,10 @@
                   [e :xt/id xtid]
                   [e :site/name name]]}))
 
-(defn get-all [component-node](xt/q (component-node)
-                      '{:find [(pull e [*])]
-                        :where [[e :xt/id]]}))
+(defn get-all [component-node]
+  (xt/q (xt/db component-node)
+        '{:find [(pull e [*])]
+          :where [[e :xt/id]]}))
 
 (defn delete-entity [component-node xtid]
   (xt/submit-tx component-node
