@@ -23,7 +23,7 @@
                    [:application]))
 
 
-(defn my-database [] (my-components/map->Database db/xtdb-node))
+(defn my-database [] (my-components/map->Database {}))
 
 ;; This is the piece that combines the generic web server component above with
 ;; your application-specific component defined at the top of the file, and
