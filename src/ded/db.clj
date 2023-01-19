@@ -59,16 +59,20 @@
           :where [[e :site/id ?id]]}
         id))
 
-(defn get-site-ids []
-  (xt/q (xt/db xtdb-node)
+(defn get-site-ids [component-node]
+  (xt/q (xt/db component-node)
         '{:find  [xtid id name]
           :where [[e :site/id id]
                   [e :xt/id xtid]
                   [e :site/name name]]}))
 
-(defn get-all [node](xt/q (xt/db node)
+(defn get-all [component-node](xt/q (component-node)
                       '{:find [(pull e [*])]
                         :where [[e :xt/id]]}))
+
+(defn delete-entity [component-node xtid]
+  (xt/submit-tx component-node
+                [[::xt/delete xtid]]))
 
 (comment
   (get-site-by-id 101 xtdb-node)
