@@ -39,8 +39,11 @@
 (defrecord Database [datasource] ; state
   component/Lifecycle
   (start [this]
-    (db/stop-xtdb!)
-    (let [node (db/start-xtdb!)]
-      node))
+    (if datasource
+      this
+      (do
+        (db/stop-xtdb!)
+        (let [node (db/start-xtdb!)]
+          node))))
   (stop [this]
-    (db/stop-xtdb!)))
+    (.close datasource)))
