@@ -27,3 +27,28 @@
  ;; (.close mynode)
 
  ;; this may also kill the repl, but if you restart it should restart clean
+
+(def demo-sites [{:xt/id :rompers
+                 :site/name "Rompers"
+                 :site/location "Tiffenham"
+                 :site/type "Garbage Dump"
+                 :site/id 100}
+
+                 {:xt/id :rompers2
+                 :site/name "Rompers 2"
+                 :site/location "Tiffenham"
+                 :site/type "Garbage Dump"
+                 :site/id 102}
+
+                 {:xt/id :rompers3
+                 :site/name "Rompers 3"
+                 :site/location "Tiffenham"
+                 :site/type "Garbage Dump"
+                 :site/id 103}])
+
+(defn prepare-tx [docs]
+  (mapv (fn [doc] [::xt/put doc]) docs))
+
+(defn get-node [](-> system :application :database))
+
+(defn transact-test-data [node docs] (xt/submit-tx node docs))
