@@ -74,8 +74,3 @@
 (defn delete-entity [component-node xtid]
   (xt/submit-tx component-node
                 [[::xt/delete xtid]]))
-
-(comment
-  (get-site-by-id 101 xtdb-node)
-  (get-site-ids)
-  ,)
