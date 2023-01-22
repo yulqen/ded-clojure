@@ -9,4 +9,7 @@
                 :site/type "Test Type"
                 :site/id 100})
 
+;; TODO Test some basic middleware functionality
+;; TODO Add some fixtures here: empty node, node containing sites, etc
+
 
