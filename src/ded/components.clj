@@ -41,9 +41,7 @@
   (start [this]
     (if datasource
       this
-      (do
-        (db/stop-xtdb!)
-        (let [node (db/start-xtdb!)]
-          node))))
+      (let [node (db/start-xtdb!)]
+        node)))
   (stop [this]
     (.close datasource)))

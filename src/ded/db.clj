@@ -18,11 +18,11 @@
 ;; (defn start-xtdb! []
 ;;   (xt/start-node {}))
 
-(def xtdb-node (start-xtdb!))
+#_(def xtdb-node (start-xtdb!))
 ;; note that attempting to eval this expression more than once before first calling `stop-xtdb!` will throw a RocksDB locking error
 ;; this is because a node that depends on native libraries must be `.close`'d explicitly
 
-(defn stop-xtdb! []
+#_(defn stop-xtdb! []
   (.close xtdb-node))
 
 (def site1 {:xt/id :mammoth-site
