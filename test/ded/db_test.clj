@@ -1,5 +1,7 @@
 (ns ded.db-test
-  (:require [xtdb.api :as xt]))
+  (:require [xtdb.api :as xt]
+            [clojure.test :refer :all]
+            [ded.db :as db]))
 
 (def node (xt/start-node {}))
 
@@ -12,4 +14,6 @@
 ;; TODO Test some basic middleware functionality
 ;; TODO Add some fixtures here: empty node, node containing sites, etc
 
-
+(deftest set-up
+  (db/add-site node test-site)
+  (is (+ 1 1)))
