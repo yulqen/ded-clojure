@@ -1,0 +1,11 @@
+[{:xt/id :test-site-1
+  :site/name "Test Site 1"
+  :site/location "Test Location 1"
+  :site/type "Test Type"
+  :site/id 100}
+ {:xt/id :test-site-2
+  :site/name "Test Site 2"
+  :site/location "Test Location 2"
+  :site/type "Test Type"
+  :site/id 102}
+ ]
