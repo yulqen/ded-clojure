@@ -37,6 +37,11 @@
             :site/id 101
             :site/location "Grimthorpe Jyres"})
 
+(defn prep-trx
+  "Wrap a sequence of maps (docs) in preparation for transacting into database."
+  [docs]
+  (mapv (fn [doc] [::xt/put doc]) docs))
+
 
 ;; We need our xt/id fields to be automatically generated.
 ;; Schema ideas:

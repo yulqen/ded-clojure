@@ -1,6 +1,6 @@
 (ns ded.db-test
   (:require [xtdb.api :as xt]
-            [clojure.test :refer :all]
+            [clojure.test :refer [deftest use-fixtures is]]
             [clojure.edn :as edn]
             [ded.db :as db]))
 
@@ -9,18 +9,19 @@
 
 (declare ^:dynamic *node*)
 
-(defn with-node [f]
-  (letfn [(prep-trx [docs]
-            (mapv (fn [doc] [::xt/put doc]) docs))]
-    (binding [*node* (xt/start-node {})]
-      (xt/submit-tx *node* (prep-trx (edn/read-string (slurp "test/ded/initial.edn"))))
-      (xt/sync *node*)
-      (f)
-      (.close *node*))))
+(defn with-node
+  "Fixture to add data from initial.edn to test database."
+  [f]
+  (binding [*node* (xt/start-node {})]
+    (xt/submit-tx *node* (db/prep-trx
+                          (edn/read-string (slurp "test/ded/initial.edn"))))
+    (xt/sync *node*)
+    (f)
+    (.close *node*)))
 
 (use-fixtures :each with-node)
 
-(deftest test-1
+(deftest test-populate
   (is (= :test-site-1 (first (first (db/get-site-by-id 100 *node*)))))
   (is (= :test-site-2 (first (first (db/get-site-by-id 102 *node*))))))
 
