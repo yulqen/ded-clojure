@@ -21,9 +21,11 @@
 
 (use-fixtures :each with-node)
 
-(deftest test-populate
+(deftest get-site-controllers
   (is (= :test-site-1 (first (first (db/get-site-by-id 100 *node*)))))
   (is (= :test-site-2 (first (first (db/get-site-by-id 102 *node*)))))
-  (is (= #{[:test-site-2 102 "Test Site 2"] [:test-site-1 100 "Test Site 1"]} (db/get-site-ids *node*))))
+  (is (= #{[:test-site-2 102 "Test Site 2"]
+           [:test-site-1 100 "Test Site 1"]}
+         (db/get-site-ids *node*))))
 
 
