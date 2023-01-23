@@ -18,16 +18,18 @@
 ;; TODO Test some basic middleware functionality
 ;; TODO Add some fixtures here: empty node, node containing sites, etc
 
-(def ^:dynamic *node*)
+(declare ^:dynamic *node*)
 
 (defn with-node [f]
   (binding [*node* (xt/start-node {})]
-    (xt/submit-tx *node* [[::xt/put test-site2]])
-    (try (f)
-         (finally
-           (.close *node*)))))
+    (xt/submit-tx *node* [[::xt/put test-site]])
+    (xt/sync *node*)
+    (f)
+    (.close *node*)))
 
 (use-fixtures :each with-node)
 
 (deftest test-1
-  (is (= "Nonce" (db/get-site-by-id 100 *node*))))
+  (is (= :test-site-1 (first (first (db/get-site-by-id 100 *node*))))))
+
+
