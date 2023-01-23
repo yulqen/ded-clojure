@@ -7,6 +7,9 @@
 ;; TODO Test some basic middleware functionality
 ;; TODO Add some fixtures here: empty node, node containing sites, etc
 
+;; we wish to work with an in-memory node
+;; we use binding in the fixture below to assign this Var to the xtdb node
+;; and then release it afterwards
 (declare ^:dynamic *node*)
 
 (defn with-node
