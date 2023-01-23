@@ -42,6 +42,17 @@
   [docs]
   (mapv (fn [doc] [::xt/put doc]) docs))
 
+(defprotocol Storeable
+  (add [this node])
+  (edit [this node]))
+
+(defrecord SiteOp [sname]
+  Storeable
+  (add [this node] (conj node (:sname this)))
+  (edit [this node] (conj node (:sname this))))
+
+(def op (map->SiteOp {:sname "Heraldo"}))
+
 
 ;; We need our xt/id fields to be automatically generated.
 ;; Schema ideas:
