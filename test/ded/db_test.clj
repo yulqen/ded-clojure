@@ -4,18 +4,6 @@
             [clojure.edn :as edn]
             [ded.db :as db]))
 
-(def test-site {:xt/id :test-site-1
-                :site/name "Test Site 1"
-                :site/location "Test Location 1"
-                :site/type "Test Type"
-                :site/id 100})
-
-(def test-site2 {:xt/id :test-site2
-                :site/name "Test Site 2"
-                :site/location "Test Location 2"
-                :site/type "Test Type"
-                :site/id 102})
-
 ;; TODO Test some basic middleware functionality
 ;; TODO Add some fixtures here: empty node, node containing sites, etc
 
