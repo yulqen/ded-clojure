@@ -42,17 +42,6 @@
   [docs]
   (mapv (fn [doc] [::xt/put doc]) docs))
 
-(defprotocol Storeable
-  (add [this node])
-  (edit [this node]))
-
-(defrecord SiteOp [sname]
-  Storeable
-  (add [this node] (conj node (:sname this)))
-  (edit [this node] (conj node (:sname this))))
-
-(def op (map->SiteOp {:sname "Heraldo"}))
-
 
 ;; We need our xt/id fields to be automatically generated.
 ;; Schema ideas:
@@ -90,3 +79,27 @@
 (defn delete-entity [component-node xtid]
   (xt/submit-tx component-node
                 [[::xt/delete xtid]]))
+
+;; here begins a data modelling section
+
+(defrecord SiteOp [serial typecode ;; identifiers
+                   name location desc ;; human descriptions
+                   rp ;; people
+                   ])
+
+(defn make-siteop
+  "Create a SiteOp record, giving a typecode and name as strings. Optionally,
+  provide an additional map of the other fields."
+  [name & opts]
+  (let [{:keys  [location desc latest-id rp]} opts
+        new-serial (if latest-id
+                    (inc latest-id)
+                    1)
+        thisid (apply str (concat "SOP" (str new-serial)))]
+    (map->SiteOp {:xt/id (keyword thisid)
+                  :serial new-serial
+                  :typecode :SOP
+                  :name name
+                  :location location
+                  :desc desc
+                  :rp rp})))
