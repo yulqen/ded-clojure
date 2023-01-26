@@ -82,16 +82,36 @@
 
 ;; here begins a data modelling section
 
+(defrecord Person [serial typecode
+                   first-name last-name title
+                   role
+                   ])
+
+(defn make-person
+  [first-name last-name & opts]
+  (let [{:keys [title role latest-id]} opts
+        new-serial (if latest-id
+                     (inc latest-id)
+                     1)
+        thisid (apply str (concat "PRS" (str new-serial)))]
+    (map->Person {:xt/id (keyword thisid)
+                  :serial new-serial
+                  :typecode :PRS
+                  :first-name first-name
+                  :last-name last-name
+                  :role role
+                  :title title})))
+
 (defrecord SiteOp [serial typecode ;; identifiers
                    name location desc ;; human descriptions
-                   rp ;; people
+                   people ;; vector of Person
                    ])
 
 (defn make-siteop
   "Create a SiteOp record, giving a typecode and name as strings. Optionally,
   provide an additional map of the other fields."
   [name & opts]
-  (let [{:keys  [location desc latest-id rp]} opts
+  (let [{:keys  [location desc latest-id people]} opts
         new-serial (if latest-id
                     (inc latest-id)
                     1)
@@ -102,4 +122,4 @@
                   :name name
                   :location location
                   :desc desc
-                  :rp rp})))
+                  :people people})))

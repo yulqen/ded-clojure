@@ -13,6 +13,13 @@
 
 ;; TODO start testing the record constructors
 
+(deftest make-person
+  (is (= (:serial (db/make-person "Colin" "McLintock")) 1))
+  (is (= (:serial (db/make-person "Colin" "McLintock"
+                                  {:latest-id 120})) 121))
+  (is (= (:title (db/make-person "Colin" "McLintock"
+                                  {:title "Mr"})) "Mr")))
+
 (deftest make-siteop
   (is (= (:serial (db/make-siteop "Test Site 2" {:latest-id 10})) 11))
   (is (= (:typecode (db/make-siteop "Test Site 3")) :SOP))
