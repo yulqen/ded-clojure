@@ -18,7 +18,11 @@
   (is (= (:serial (db/make-person "Colin" "McLintock"
                                   {:latest-id 120})) 121))
   (is (= (:title (db/make-person "Colin" "McLintock"
-                                  {:title "Mr"})) "Mr")))
+                                 {:title "Mr"})) "Mr"))
+  (is (= (first (:phone-numbers
+                 (db/make-person "Colin" "McLintock"
+                                 {:title "Mr"
+                                  :phone-numbers ["0700 303 2343" "0800 203 2434"]}))) "0700 303 2343")))
 
 (deftest make-siteop
   (is (= (:serial (db/make-siteop "Test Site 2" {:latest-id 10})) 11))
