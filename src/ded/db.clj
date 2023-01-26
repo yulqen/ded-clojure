@@ -86,11 +86,14 @@
                    first-name last-name title
                    role
                    phone-numbers
+                   primary-email secondary-email
                    ])
 
 (defn make-person
   [first-name last-name & opts]
-  (let [{:keys [title role latest-id phone-numbers]} opts
+  (let [{:keys [title role latest-id
+                phone-numbers
+                primary-email secondary-email]} opts
         new-serial (if latest-id
                      (inc latest-id)
                      1)
@@ -102,6 +105,8 @@
                   :last-name last-name
                   :role role
                   :phone-numbers phone-numbers
+                  :primary-email primary-email
+                  :secondary-email secondary-email
                   :title title})))
 
 (defrecord SiteOp [serial typecode ;; identifiers
