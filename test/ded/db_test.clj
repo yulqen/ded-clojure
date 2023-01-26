@@ -27,7 +27,13 @@
     (is (= (first (:phone-numbers
                    (db/make-person "Colin" "McLintock"
                                    {:title "Mr"
-                                    :phone-numbers ["0700 303 2343" "0800 203 2434"]}))) "0700 303 2343"))))
+                                    :phone-numbers ["0700 303 2343" "0800 203 2434"]}))) "0700 303 2343")))
+
+  ;; TODO: mock a database query function here, to get related?
+  (testing "SiteOp relationship"
+    (let [new-site (db/make-siteop "Test")
+          person (db/make-person "Alan" "Titch" {:siteop-id (:xt/id new-site)})]
+      ())))
 
 (deftest make-siteop
   (is (= (:serial (db/make-siteop "Test Site 2" {:latest-id 10})) 11))
