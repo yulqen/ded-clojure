@@ -31,12 +31,12 @@
 
   ;; This is not a good test... 
   (testing "SiteOp relationship"
-    (let [new-site (db/make-siteop "Test")
-          n {}
-          new-site-id (:xt/id new-site)
-          person (db/make-person "Alan" "Titch" {:siteop-id new-site-id})]
-      (with-redefs-fn {#'db/get-people-for-siteop
-                       (fn [n id] [{:first-name "Alan"}])}
+    (let [new-site (db/make-siteop "Test") ;; create a new test using make-siteop, which is bad...
+          n {} ;; we need a mock xtdb node
+          new-site-id (:xt/id new-site) ;; get the xtdb id of the new site
+          person (db/make-person "Alan" "Titch" {:siteop-id new-site-id})] ;; create the new person and their relationship to the site
+      (with-redefs-fn {#'db/get-people-for-siteop ;; here we are mocking this func...
+                       (fn [n id] [{:first-name "Alan"}])} ;; ..to produce what we need for this test...
         #(is (= "Alan" (:first-name (first (db/get-people-for-siteop n new-site-id)))))))))
 
 (deftest make-siteop
