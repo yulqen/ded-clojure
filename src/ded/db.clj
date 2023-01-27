@@ -51,6 +51,11 @@
 
 (str/join "-" (take 2 (str/split (.toString (UUID/randomUUID)) #"-")))
 
+(defn get-people-for-siteop
+  "TODO: Complete fill out this function"
+  [component-node siteid]
+  )
+
 (defn add-site [component-node site]
   (xt/submit-tx component-node
                 [[::xt/put
